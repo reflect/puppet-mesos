@@ -43,6 +43,7 @@ class mesos::master(
   $force_provider   = undef, #temporary workaround for starting services
   $use_hiera        = $mesos::use_hiera,
   $single_role      = $mesos::single_role,
+  $manage_zookeeper = $mesus::manage_zookeeper,
 ) inherits mesos {
 
   validate_hash($env_var)
