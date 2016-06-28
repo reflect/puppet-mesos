@@ -40,13 +40,15 @@ class mesos::config(
     group  => $group,
   }
 
-  file { $conf_file:
-    ensure  => 'present',
-    content => template('mesos/default.erb'),
-    owner   => $owner,
-    group   => $group,
-    mode    => '0644',
-    require => Package['mesos'],
+  if $conf_file {
+    file { $conf_file:
+      ensure  => 'present',
+      content => template('mesos/default.erb'),
+      owner   => $owner,
+      group   => $group,
+      mode    => '0644',
+      require => Package['mesos'],
+    }
   }
 
   if $manage_zk_file {

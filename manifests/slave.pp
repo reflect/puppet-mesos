@@ -91,12 +91,44 @@ class mesos::slave (
   validate_bool($manage_service)
   validate_bool($syslog_logger)
   validate_bool($single_role)
+  validate_bool($manage_zk_file)
 
   if !empty($zookeeper) {
     if is_string($zookeeper) {
       warning('\$zookeeper parameter should be an array of IP addresses, please update your configuration.')
     }
     $zookeeper_url = zookeeper_servers_url($zookeeper, $zk_path, $zk_default_port)
+  }
+
+  $mesos_ensure = $version ? {
+    undef    => $ensure,
+    default  => $version,
+  }
+
+  if (!defined(Class['mesos::install'])) {
+    class { 'mesos::install':
+      ensure                  => $mesos_ensure,
+      repo_source             => $repo,
+      manage_python           => $manage_python,
+      manage_zookeeper        => $manage_zookeeper,
+      python_package          => $python_package,
+      remove_package_services => $force_provider == 'none',
+    }
+  }
+
+  if (!defined(Class['mesos::config'])) {
+    class { 'mesos::config':
+      log_dir        => $log_dir,
+      conf_dir       => '/etc/mesos',
+      conf_file      => $conf_file,
+      manage_zk_file => $manage_zk_file,
+      owner          => $owner,
+      group          => $group,
+      zookeeper_url  => $zookeeper_url,
+      env_var        => $env_var,
+      ulimit         => $ulimit,
+      require        => Class['mesos::install']
+    }
   }
 
   file { $conf_dir:
@@ -247,12 +279,5 @@ class mesos::slave (
     force_provider => $force_provider,
     manage         => $manage_service,
     subscribe      => File[$conf_file],
-  }
-
-  if (!defined(Class['mesos::master']) and $single_role) {
-    mesos::service { 'master':
-      enable => false,
-      manage => $manage_service,
-    }
   }
 }

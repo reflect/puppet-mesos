@@ -42,13 +42,13 @@ class mesos(
   $log_dir          = undef,
   $conf_dir         = '/etc/mesos',
   $conf_file        = '/etc/default/mesos',
-  $manage_zk_file   = true,
   $manage_service   = true,
   $zookeeper        = [],
   $zk_path          = 'mesos',
   $zk_default_port  = 2181,
   $master           = '127.0.0.1',
   $master_port      = 5050,
+  $manage_zk_file   = true,
   $owner            = 'root',
   $group            = 'root',
   $listen_address   = undef,
@@ -60,46 +60,7 @@ class mesos(
   $force_provider   = undef, #temporary workaround for starting services
   $use_hiera        = false,
   $single_role      = true,
-  $manage_zookeeper = true,
+  $manage_zookeeper = false,
 ) {
-  validate_hash($env_var)
-  validate_bool($manage_zk_file)
-  validate_bool($manage_service)
-
-  if !empty($zookeeper) {
-    if is_string($zookeeper) {
-      warning('\$zookeeper parameter should be an array of IP addresses, please update your configuration.')
-    }
-    $zookeeper_url = zookeeper_servers_url($zookeeper, $zk_path, $zk_default_port)
-  } else {
-    $zookeeper_url = undef
-  }
-
-  $mesos_ensure = $version ? {
-    undef    => $ensure,
-    default  => $version,
-  }
-
-  class {'mesos::install':
-    ensure                  => $mesos_ensure,
-    repo_source             => $repo,
-    manage_python           => $manage_python,
-    manage_zookeeper        => $manage_zookeeper,
-    python_package          => $python_package,
-    remove_package_services => $force_provider == 'none',
-  }
-
-  class {'mesos::config':
-    log_dir        => $log_dir,
-    conf_dir       => $conf_dir,
-    conf_file      => $conf_file,
-    manage_zk_file => $manage_zk_file,
-    owner          => $owner,
-    group          => $group,
-    zookeeper_url  => $zookeeper_url,
-    env_var        => $env_var,
-    ulimit         => $ulimit,
-    require        => Class['mesos::install']
-  }
 
 }

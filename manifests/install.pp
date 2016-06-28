@@ -15,7 +15,7 @@ class mesos::install(
   $manage_python           = false,
   $python_package          = 'python',
   $remove_package_services = false,
-  $manage_zookeeper        = $mesos::manage_zookeeper,
+  $manage_zookeeper        = false,
 ) {
   # 'ensure_packages' requires puppetlabs/stdlib
   #
@@ -36,11 +36,13 @@ class mesos::install(
   # a debian (or other binary package) must be available,
   # see https://github.com/deric/mesos-deb-packaging
   # for Debian packaging
-  $install_options = [];
-
-  if ($::osfamily == 'debian' and not $manage_zookeeper) {
-    $install_options += ['--no-install-recommends']
+  if ($::osfamily == 'Debian' and !$manage_zookeeper) {
+    $install_options = ['--no-install-recommends']
+  } else {
+    $install_options = []
   }
+
+  warning("\$install_options: ${install_options}")
 
   package { 'mesos':
     ensure  => $ensure,
