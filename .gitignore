@@ -8,3 +8,4 @@ Gemfile.lock
 Puppetfile.lock
 vendor/
 .idea
+spec/fixtures/manifests/site.pp
