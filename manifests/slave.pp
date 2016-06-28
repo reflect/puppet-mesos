@@ -71,6 +71,7 @@ class mesos::slave (
   $port             = 5051,
   $principal        = undef,
   $resources        = {},
+  $repo             = $mesos::repo,
   $secret           = undef,
   $single_role      = $mesos::single_role,
   $syslog_logger    = true,
@@ -97,7 +98,7 @@ class mesos::slave (
   mesos::node { 'slave':
     ensure           => $ensure,
     version          => $version,
-    repo             => $mesos::repo,
+    repo             => $repo,
     manage_python    => $mesos::manage_python,
     manage_zookeeper => $manage_zookeeper,
     manage_zk_file   => $manage_zk_file,

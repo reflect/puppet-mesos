@@ -43,6 +43,7 @@ class mesos::master(
   $options          = {},
   $owner            = $mesos::owner,
   $python_package   = $mesos::python_package,
+  $repo             = $mesos::repo,
   $single_role      = $mesos::single_role,
   $syslog_logger    = true,
   $ulimit           = $mesos::ulimit,
@@ -95,7 +96,7 @@ class mesos::master(
   mesos::node { 'master':
     ensure           => $ensure,
     version          => $version,
-    repo             => $mesos::repo,
+    repo             => $repo,
     manage_python    => $mesos::manage_python,
     manage_zookeeper => $manage_zookeeper,
     manage_zk_file   => $manage_zk_file,
