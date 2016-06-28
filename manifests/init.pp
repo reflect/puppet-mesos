@@ -60,7 +60,7 @@ class mesos(
   $force_provider   = undef, #temporary workaround for starting services
   $use_hiera        = false,
   $force_provider   = undef,
-  $single_role      = true,
+  $single_role      = false,
   $manage_zookeeper = false,
 ) {
   validate_hash($env_var)
