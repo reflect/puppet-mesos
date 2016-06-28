@@ -66,7 +66,9 @@ class mesos::slave (
   $group            = $mesos::group,
   $listen_address   = $mesos::listen_address,
   $manage_service   = $mesos::manage_service,
-  $env_var          = {},
+  $env_var          = $mesos::env_var,
+  $version          = $mesos::version,
+  $ensure           = $mesos::ensure,
   $cgroups          = {},
   $options          = {},
   $resources        = {},
@@ -77,9 +79,8 @@ class mesos::slave (
   $force_provider   = undef, #temporary workaround for starting services
   $use_hiera        = $mesos::use_hiera,
   $single_role      = $mesos::single_role,
+  $manage_zookeeper = $mesos::manage_zookeeper,
 ) inherits mesos {
-
-  validate_hash($env_var)
   validate_hash($cgroups)
   validate_hash($options)
   validate_hash($resources)
@@ -93,42 +94,15 @@ class mesos::slave (
   validate_bool($single_role)
   validate_bool($manage_zk_file)
 
-  if !empty($zookeeper) {
-    if is_string($zookeeper) {
-      warning('\$zookeeper parameter should be an array of IP addresses, please update your configuration.')
-    }
-    $zookeeper_url = zookeeper_servers_url($zookeeper, $zk_path, $zk_default_port)
-  }
-
-  $mesos_ensure = $version ? {
-    undef    => $ensure,
-    default  => $version,
-  }
-
-  if (!defined(Class['mesos::install'])) {
-    class { 'mesos::install':
-      ensure                  => $mesos_ensure,
-      repo_source             => $repo,
-      manage_python           => $manage_python,
-      manage_zookeeper        => $manage_zookeeper,
-      python_package          => $python_package,
-      remove_package_services => $force_provider == 'none',
-    }
-  }
-
-  if (!defined(Class['mesos::config'])) {
-    class { 'mesos::config':
-      log_dir        => $log_dir,
-      conf_dir       => '/etc/mesos',
-      conf_file      => $conf_file,
-      manage_zk_file => $manage_zk_file,
-      owner          => $owner,
-      group          => $group,
-      zookeeper_url  => $zookeeper_url,
-      env_var        => $env_var,
-      ulimit         => $ulimit,
-      require        => Class['mesos::install']
-    }
+  mesos::node { 'slave':
+    ensure           => $ensure,
+    version          => $version,
+    repo             => $mesos::repo,
+    manage_python    => $mesos::manage_python,
+    manage_zookeeper => $manage_zookeeper,
+    manage_zk_file   => $manage_zk_file,
+    zookeeper        => $zookeeper,
+    env_var          => $env_var,
   }
 
   file { $conf_dir:
@@ -251,6 +225,15 @@ class mesos::slave (
     }
   )
 
+  # TODO: This is kind of copy-pasta'd all over the place. How can we refactor
+  # this to make it more sane?
+  if !empty($zookeeper) {
+    if is_string($zookeeper) {
+      warning('\$zookeeper parameter should be an array of IP addresses, please update your configuration.')
+    }
+    $zookeeper_url = zookeeper_servers_url($zookeeper, $zk_path, $zk_default_port)
+  }
+
   file { $conf_file:
     ensure  => 'present',
     content => template('mesos/slave.erb'),
@@ -264,6 +247,7 @@ class mesos::slave (
     true  => absent,
     false => present,
   }
+
   mesos::property { 'slave_logger':
     ensure => $logger_ensure,
     file   => 'logger',
@@ -279,5 +263,12 @@ class mesos::slave (
     force_provider => $force_provider,
     manage         => $manage_service,
     subscribe      => File[$conf_file],
+  }
+
+  if (!defined(Class['mesos::master']) and $single_role) {
+    mesos::service { 'master':
+      enable => false,
+      manage => $manage_service,
+    }
   }
 }

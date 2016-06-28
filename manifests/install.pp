@@ -42,8 +42,6 @@ class mesos::install(
     $install_options = []
   }
 
-  warning("\$install_options: ${install_options}")
-
   package { 'mesos':
     ensure  => $ensure,
     install_options => $install_options,
