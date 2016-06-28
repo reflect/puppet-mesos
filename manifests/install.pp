@@ -33,15 +33,16 @@ class mesos::install(
     source => $repo_source,
   }
 
-  # a debian (or other binary package) must be available,
-  # see https://github.com/deric/mesos-deb-packaging
-  # for Debian packaging
+  # TODO: How should this be handled for other package managers?
   if ($::osfamily == 'Debian' and !$manage_zookeeper) {
     $install_options = ['--no-install-recommends']
   } else {
     $install_options = []
   }
 
+  # a debian (or other binary package) must be available,
+  # see https://github.com/deric/mesos-deb-packaging
+  # for Debian packaging
   package { 'mesos':
     ensure  => $ensure,
     install_options => $install_options,
