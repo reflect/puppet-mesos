@@ -9,3 +9,4 @@ Puppetfile.lock
 vendor/
 .idea
 spec/fixtures/manifests/site.pp
+*.sw[onp]
