@@ -66,3 +66,5 @@ class mesos(
   validate_hash($env_var)
   validate_bool($manage_zookeeper)
 }
+
+

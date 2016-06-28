@@ -11,11 +11,11 @@
 #
 class mesos::install(
   $ensure                  = 'present',
-  $repo_source             = undef,
   $manage_python           = false,
+  $manage_zookeeper        = false,
   $python_package          = 'python',
   $remove_package_services = false,
-  $manage_zookeeper        = false,
+  $repo_source             = undef,
 ) {
   # 'ensure_packages' requires puppetlabs/stdlib
   #
