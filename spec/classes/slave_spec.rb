@@ -16,6 +16,34 @@ describe 'mesos::slave', :type => :class do
     puppet_debug_override
   end
 
+  context 'with given version' do
+    let(:version) { '0.20' }
+    let(:params) {{
+      :version => version
+    }}
+
+    it { should contain_package('mesos').with({
+      'ensure' => version
+    }) }
+  end
+
+  context 'remove mesos' do
+    let(:version) { 'absent' }
+    let(:params) {{
+      :ensure => version
+    }}
+
+    it { should contain_package('mesos').with({
+      'ensure' => version
+    }) }
+  end
+
+  it { should contain_class('mesos::repo') }
+  it { should contain_class('mesos::install') }
+  it { should contain_class('mesos::config') }
+  it { should contain_class('mesos::config').that_requires('Class[mesos::install]') }
+
+
   it { should contain_package('mesos') }
   it { should contain_service('mesos-slave').with(
       :ensure => 'running',

@@ -12,9 +12,36 @@ describe 'mesos::master', :type => :class do
     :group    => group,
   }}
 
-   before(:each) do
-     puppet_debug_override
-   end
+  before(:each) do
+    puppet_debug_override
+  end
+
+  context 'with given version' do
+    let(:version) { '0.20' }
+    let(:params) {{
+      :version => version
+    }}
+
+    it { should contain_package('mesos').with({
+      'ensure' => version
+    }) }
+  end
+
+  context 'remove mesos' do
+    let(:version) { 'absent' }
+    let(:params) {{
+      :ensure => version
+    }}
+
+    it { should contain_package('mesos').with({
+      'ensure' => version
+    }) }
+  end
+
+  it { should contain_class('mesos::repo') }
+  it { should contain_class('mesos::install') }
+  it { should contain_class('mesos::config') }
+  it { should contain_class('mesos::config').that_requires('Class[mesos::install]') }
 
   it { is_expected.to contain_package('mesos') }
   it { is_expected.to contain_class('mesos::master') }
