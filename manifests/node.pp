@@ -42,26 +42,30 @@ define mesos::node (
     default  => $version,
   }
 
-  class { 'mesos::install':
-    ensure                  => $mesos_ensure,
-    repo_source             => $repo,
-    manage_python           => $manage_python,
-    manage_zookeeper        => $manage_zookeeper,
-    python_package          => $python_package,
-    remove_package_services => $force_provider == 'none',
+  if (!defined(Class['mesos::install'])) {
+    class { 'mesos::install':
+      ensure                  => $mesos_ensure,
+      repo_source             => $repo,
+      manage_python           => $manage_python,
+      manage_zookeeper        => $manage_zookeeper,
+      python_package          => $python_package,
+      remove_package_services => $force_provider == 'none',
+    }
   }
 
-  class { 'mesos::config':
-    log_dir        => $log_dir,
-    conf_dir       => $default_conf_dir,
-    conf_file      => $default_conf_file,
-    manage_zk_file => $manage_zk_file,
-    owner          => $owner,
-    group          => $group,
-    zookeeper_url  => $zookeeper_url,
-    env_var        => $env_var,
-    ulimit         => $ulimit,
-    require        => Class['mesos::install']
+  if (!defined(Class['mesos::config'])) {
+    class { 'mesos::config':
+      log_dir        => $log_dir,
+      conf_dir       => $default_conf_dir,
+      conf_file      => $default_conf_file,
+      manage_zk_file => $manage_zk_file,
+      owner          => $owner,
+      group          => $group,
+      zookeeper_url  => $zookeeper_url,
+      env_var        => $env_var,
+      ulimit         => $ulimit,
+      require        => Class['mesos::install']
+    }
   }
 }
 
