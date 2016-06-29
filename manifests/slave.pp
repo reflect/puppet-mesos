@@ -78,7 +78,7 @@ class mesos::slave (
   $use_hiera        = $mesos::use_hiera,
   $version          = $mesos::version,
   $work_dir         = '/tmp/mesos',
-  $zk_default_port  = $mesos::zk_default_port,
+  $zk_port          = $mesos::zk_default_port,
   $zk_path          = $mesos::zk_path,
   $zookeeper        = $mesos::zookeeper,
 ) inherits mesos {
@@ -104,6 +104,8 @@ class mesos::slave (
     manage_zk_file   => $manage_zk_file,
     zookeeper        => $zookeeper,
     env_var          => $env_var,
+    zk_path          => $zk_path,
+    zk_port          => $zk_port,
   }
 
   file { $conf_dir:
@@ -232,7 +234,7 @@ class mesos::slave (
     if is_string($zookeeper) {
       warning('\$zookeeper parameter should be an array of IP addresses, please update your configuration.')
     }
-    $zookeeper_url = zookeeper_servers_url($zookeeper, $zk_path, $zk_default_port)
+    $zookeeper_url = zookeeper_servers_url($zookeeper, $zk_path, $zk_port)
   }
 
   file { $conf_file:

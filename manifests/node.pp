@@ -24,17 +24,21 @@ define mesos::node (
   $python_package    = 'python',
   $force_provider    = undef,
   $env_var           = {},
+  $zk_port           = undef,
+  $zk_path           = undef,
 ) {
   validate_hash($env_var)
   validate_bool($manage_zk_file)
   validate_bool($manage_python)
   validate_bool($manage_zookeeper)
+  validate_integer($zk_port)
+  validate_string($zk_path)
 
   if !empty($zookeeper) {
     if is_string($zookeeper) {
       warning('\$zookeeper parameter should be an array of IP addresses, please update your configuration.')
     }
-    $zookeeper_url = zookeeper_servers_url($zookeeper, $zk_path, $zk_default_port)
+    $zookeeper_url = zookeeper_servers_url($zookeeper, $zk_path, $zk_port)
   }
 
   $mesos_ensure = $version ? {
@@ -68,5 +72,3 @@ define mesos::node (
     }
   }
 }
-
-
