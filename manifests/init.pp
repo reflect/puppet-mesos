@@ -59,7 +59,6 @@ class mesos(
   $python_package   = 'python',
   $force_provider   = undef, #temporary workaround for starting services
   $use_hiera        = false,
-  $force_provider   = undef,
   $single_role      = false,
   $manage_zookeeper = false,
 ) {

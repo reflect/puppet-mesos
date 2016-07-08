@@ -24,7 +24,6 @@ class mesos::master(
   $acls_file        = '/etc/mesos/acls',
   $cluster          = 'mesos',
   $conf_dir         = '/etc/mesos-master',
-  $conf_file        = $mesos::conf_file,
   $conf_file        = '/etc/default/mesos-master',
   $credentials      = [],
   $credentials_file = '/etc/mesos/master-credentials',
