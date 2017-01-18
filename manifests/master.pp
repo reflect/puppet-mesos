@@ -110,7 +110,6 @@ class mesos::master(
     owner   => $owner,
     group   => $group,
     recurse => true,
-    purge   => true,
     force   => true,
     require => Class['::mesos::install'],
     notify  => Service['mesos-master'], # when key is removed we want to reload the service

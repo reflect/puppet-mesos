@@ -113,7 +113,6 @@ class mesos::slave (
     owner   => $owner,
     group   => $group,
     recurse => true,
-    purge   => true,
     force   => true,
     notify  => Service['mesos-slave'], # when key is removed we want to reload the service
   }
